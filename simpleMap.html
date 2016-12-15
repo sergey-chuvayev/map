@@ -17,12 +17,16 @@
     <script src="lib/ngeohash.js"></script>
     <script src="lib/leaflet-marker-cluster.js"></script>
     <script src="lib/parse-1.2.13.min.js"></script>
+    <script
+  src="https://code.jquery.com/jquery-2.2.4.min.js"
+  integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+  crossorigin="anonymous"></script>
 </head>
 <body>
 <div id="map"></div>
 <script>
     map = L.map('map',{minZoom:3});
-    var mapboxTiles = L.tileLayer('https://{s}.tiles.mapbox.com/v3/{mapid}/{z}/{x}/{y}.png', {
+    var mapboxTiles = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
     mapid: 'cyrilcherian.cc320505'
     }).addTo(map);
     map.on('load', function(e){search()});
@@ -48,11 +52,11 @@
 
         var markerList = [];
         aggs.forEach(function(agg, index){
-            var center = geohash.decode (agg.key);//elastic return a geohas so need to change it into lat/lon
+            // var center = geohash.decode (agg.key);//elastic return a geohas so need to change it into lat/lon
             var myIcon = L.divIcon({ html: '<div class="clustergroup0 leaflet-marker-icon marker-cluster marker-cluster-medium leaflet-zoom-animated leaflet-clickable" tabindex="0" style="margin-left: -20px; margin-top: -20px; width: 40px; height: 40px; z-index: 233;"><div><span>'+agg.doc_count+'</span></div></div>' });
             var marker = L.marker(new L.LatLng(center.latitude, center.longitude),{icon:myIcon});
             marker.count = agg.doc_count;
-            marker.sentiment = agg.sentiment_avg.value;
+            // marker.sentiment = agg.sentiment_avg.value;
             marker.bindPopup(''+agg.doc_count);
             markerList.push(marker);
         });
@@ -100,6 +104,18 @@
             console.log(error)
           }
         });
+
+        var data = "utf8=%E2%9C%93&authenticity_token=wWxDsm8gi1qbd6sWccFRi7P%2FwhL%2FlaAeJdM2GO37yiY%3D&media_type_id%5B%5D=0&source_id%5B%5D=0&source_id%5B%5D=1&source_id%5B%5D=4&source_id%5B%5D=5&source_id%5B%5D=6&source_id%5B%5D=7&source_id%5B%5D=8&source_id%5B%5D=9&source_id%5B%5D=10&is360=false&longitude=359.999998&latitude=43.999999999999986&location=&distance=6590.990821170238&min_resolution_id=&max_resolution_id=&color_hex=&people%5B%5D=any&people%5B%5D=&gender=any&min_age=1&max_age=100&price=any&scope=internal&symbols=&order_by=date&clusterize=true&query=";
+
+        $.ajax({
+          url: "https:/lobster.media/search",
+          method: "POST",
+          data: data,
+          success: function(data) {
+            makePoints(data.items);
+          }
+        });
+                    
    }
 
 </script>
